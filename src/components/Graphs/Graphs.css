@@ -4,6 +4,7 @@
   margin: 15px 0px;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .highcharts-series-group {
