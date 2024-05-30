@@ -7,7 +7,12 @@
   width: 100%;
 }
 
-.buttons-container {
+.inputNumber {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
+}
+
+input {
+  padding: 4px;
+  border-radius: 4px;
 }

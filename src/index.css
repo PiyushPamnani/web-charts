@@ -4,19 +4,26 @@
 }
 
 button {
-  height: 42px;
-  width: 75px;
-  background: #f6f6f6;
-  border-radius: 8px;
-  border: 1px solid #cacaca;
-  color: #ff4747;
-  font-size: 17px;
-  font-weight: 400;
-  transition: 300ms ease-in-out;
+  background-color: #007bff; /* Primary color */
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 button:hover {
-  cursor: pointer;
-  background: #cacaca;
-  color: #ea2a2a;
+  background-color: #0056b3; /* Darker shade for hover */
+  transform: scale(1.05);
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }

@@ -1,93 +1,74 @@
-import React from "react";
+import React, { useState, useEffect, useMemo, memo } from "react";
 import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import image1 from "../../assets/header.webp";
-import image2 from "../../assets/footer.webp";
+import { players, table_headers } from "./Player_Data";
 
-const Table = ({ rowNumber, columnNumber }) => {
-  const tableData = Array.from({ length: rowNumber }, (_, rowIndex) =>
-    Array.from({ length: columnNumber }, (_, colIndex) => ({
-      type: colIndex === columnNumber - 1 ? "image" : "text",
-      value:
-        colIndex === columnNumber - 1
-          ? "https://source.unsplash.com/random"
-          : `Row ${rowIndex + 1}, Col ${colIndex + 1}`,
-    }))
+const TableRow = memo(({ row, rowIndex, columnNumber }) => (
+  <tr key={rowIndex} className="table_body">
+    {row.map((cell, cellIndex) => (
+      <td key={cellIndex} style={{ border: "1px solid black", padding: "8px" }}>
+        {cell.type === "image" ? (
+          <>
+            <p>
+              {rowIndex + 1}. {players[rowIndex % 11].player_name}
+            </p>
+            <img src={cell.value} alt="Random" style={{ width: "50px" }} />
+          </>
+        ) : (
+          cell.value
+        )}
+      </td>
+    ))}
+  </tr>
+));
+
+const Table = ({ rowNumber, columnNumber, setBodyImages, setTablesReady }) => {
+  const [tableDataReady, setTableDataReady] = useState(false);
+
+  const tableData = useMemo(
+    () =>
+      Array.from({ length: rowNumber }, (_, rowIndex) =>
+        Array.from({ length: columnNumber }, (_, colIndex) => ({
+          type: colIndex === columnNumber - 1 ? "image" : "text",
+          value:
+            colIndex === columnNumber - 1
+              ? players[rowIndex % 11].player_image
+              : `Row ${rowIndex + 1}, Col ${colIndex + 1}`,
+        }))
+      ),
+
+    [rowNumber, columnNumber]
   );
 
-  const downloadPDF = () => {
-    const pdf = new jsPDF("p", "mm", "a4", true);
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
+  useEffect(() => {
+    if (tableData.length) {
+      setTableDataReady(true);
+    }
+  }, [tableData]);
 
-    const headerElement = document.querySelector(".table_head");
-    const bodyElements = document.querySelectorAll(".table_body");
+  useEffect(() => {
+    const fetchTableImage = async () => {
+      const bodyElements = document.querySelectorAll(".table_body");
 
-    html2canvas(headerElement).then((headerCanvas) => {
-      const headerImgData = headerCanvas.toDataURL("image/png");
-      const headerHeight =
-        (headerCanvas.height * pageWidth) / headerCanvas.width;
-
-      let currentPageHeight = 0;
-
-      console.log(headerHeight, "Header Height");
-      const addHeader = (tableName, reportDate) => {
-        pdf.setFontSize(12);
-        pdf.addImage(image1, "PNG", 0, 0, pageWidth, 45);
-        pdf.setTextColor(255, 255, 0);
-        pdf.textWithLink("Click here", 150, 15, { url: "https://jio.com" });
-        pdf.text(`Table: ${tableName}`, 10, 5);
-        pdf.text(`Report Date: ${reportDate}`, 10, 15);
-        pdf.addImage(headerImgData, "PNG", 0, 50, pageWidth, headerHeight);
-        currentPageHeight = headerHeight + 50;
+      const captureImages = async (bodyElement) => {
+        const canvas = await html2canvas(bodyElement, { scale: 1 });
+        return canvas.toDataURL("image/png");
       };
 
-      const addFooter = () => {
-        pdf.addImage(image2, "PNG", 0, pageHeight - 45, 210, 45);
-        pdf.setTextColor(255, 255, 0);
-        pdf.textWithLink("Click here", 150, pageHeight - 5, {
-          url: "https://jio.com",
-        });
-      };
+      const imageData = [];
+      for (let bodyElement of bodyElements) {
+        imageData.push(await captureImages(bodyElement));
+      }
 
-      addHeader("Sample Table", new Date().toLocaleDateString());
+      setBodyImages(imageData);
+      setTablesReady(true);
+    };
 
-      const addBody = (bodyCanvas) => {
-        const imgData = bodyCanvas.toDataURL("image/png");
-        const imgHeight = (bodyCanvas.height * pageWidth) / bodyCanvas.width;
-        console.log(imgHeight, "Body Height");
-
-        if (currentPageHeight + imgHeight > pageHeight - 50) {
-          addFooter();
-          pdf.addPage();
-          addHeader("Sample Table", new Date().toLocaleDateString());
-        }
-
-        pdf.addImage(
-          imgData,
-          "PNG",
-          0,
-          currentPageHeight,
-          pageWidth,
-          imgHeight
-        );
-        currentPageHeight += imgHeight;
-        console.log(pageHeight, "Page Height");
-        console.log(currentPageHeight, "Current Page Height");
-      };
-
-      bodyElements.forEach((bodyElement, index) => {
-        html2canvas(bodyElement)
-          .then(addBody)
-          .then(addFooter)
-          .then(() => {
-            if (index === bodyElements.length - 1) {
-              pdf.save("web-table.pdf");
-            }
-          });
-      });
-    });
-  };
+    if (tableDataReady) {
+      setTimeout(() => {
+        fetchTableImage();
+      }, 8000);
+    }
+  }, [tableDataReady]);
 
   return (
     <div>
@@ -104,36 +85,23 @@ const Table = ({ rowNumber, columnNumber }) => {
                     backgroundColor: "#f2f2f2",
                   }}
                 >
-                  Header {index + 1}
+                  {index !== columnNumber - 1 ? table_headers[index] : "Player"}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {tableData.map((row, rowIndex) => (
-              <tr key={rowIndex} className="table_body">
-                {row.map((cell, cellIndex) => (
-                  <td
-                    key={cellIndex}
-                    style={{ border: "1px solid black", padding: "8px" }}
-                  >
-                    {cell.type === "image" ? (
-                      <img
-                        src={cell.value}
-                        alt="Random"
-                        style={{ width: "50px" }}
-                      />
-                    ) : (
-                      cell.value
-                    )}
-                  </td>
-                ))}
-              </tr>
+              <TableRow
+                key={rowIndex}
+                row={row}
+                rowIndex={rowIndex}
+                columnNumber={columnNumber}
+              />
             ))}
           </tbody>
         </table>
       </div>
-      <button onClick={downloadPDF}>Download PDF</button>
     </div>
   );
 };
