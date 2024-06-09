@@ -24,7 +24,7 @@ const Graphs = ({ graphNumber, setChartImages, setGraphsReady }) => {
       const imageData = [];
 
       const captureImages = async (chartElement) => {
-        const canvas = await html2canvas(chartElement, { scale: 1 });
+        const canvas = await html2canvas(chartElement, { scale: 0.7 });
         imageData.push(canvas.toDataURL("image/png"));
       };
 
@@ -37,11 +37,9 @@ const Graphs = ({ graphNumber, setChartImages, setGraphsReady }) => {
     };
 
     if (dataReady) {
-      setTimeout(() => {
-        fetchChartImages();
-      }, 2000);
+      fetchChartImages();
     }
-  }, [dataReady]);
+  }, [dataReady, setChartImages, setGraphsReady]);
 
   return (
     <div>

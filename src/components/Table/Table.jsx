@@ -48,15 +48,15 @@ const Table = ({ rowNumber, columnNumber, setBodyImages, setTablesReady }) => {
   useEffect(() => {
     const fetchTableImage = async () => {
       const bodyElements = document.querySelectorAll(".table_body");
+      const imageData = [];
 
       const captureImages = async (bodyElement) => {
-        const canvas = await html2canvas(bodyElement, { scale: 1 });
-        return canvas.toDataURL("image/png");
+        const canvas = await html2canvas(bodyElement, { scale: 0.65 });
+        imageData.push(canvas.toDataURL("image/png"));
       };
 
-      const imageData = [];
       for (let bodyElement of bodyElements) {
-        imageData.push(await captureImages(bodyElement));
+        await captureImages(bodyElement);
       }
 
       setBodyImages(imageData);
@@ -64,11 +64,9 @@ const Table = ({ rowNumber, columnNumber, setBodyImages, setTablesReady }) => {
     };
 
     if (tableDataReady) {
-      setTimeout(() => {
-        fetchTableImage();
-      }, 8000);
+      fetchTableImage();
     }
-  }, [tableDataReady]);
+  }, [tableDataReady, setBodyImages, setTablesReady]);
 
   return (
     <div>

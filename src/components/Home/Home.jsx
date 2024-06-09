@@ -74,7 +74,12 @@ const Home = () => {
 
       for (let i = 0; i < 4 && chartIndex < chartImagesLoaded.length; i++) {
         const img = chartImagesLoaded[chartIndex];
-        pdf.addImage(img, "PNG", offsetX, offsetY, 103, 90);
+        if (chartIndex === graphNumber - 1 && offsetX < 100) {
+          if (offsetY > 100) continue;
+          else pdf.addImage(img, "PNG", offsetX, offsetY, 203, 180);
+        } else {
+          pdf.addImage(img, "PNG", offsetX, offsetY, 103, 90);
+        }
         offsetX += 103;
 
         if (offsetX > 190) {
