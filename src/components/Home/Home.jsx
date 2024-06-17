@@ -159,31 +159,30 @@ const Home = () => {
 
   return (
     <div className="main-box">
-      <div className="main-container">
-        <div className="inputNumber">
-          <input
-            type="number"
-            onChange={(e) => setGraphNumber(e.target.value)}
-            placeholder="Enter number of graphs you want to display"
-            required
-          />
-          <input
-            type="number"
-            onChange={(e) => setRowNumber(e.target.value)}
-            placeholder="Enter row number for table"
-            required
-          />
-          <input
-            type="number"
-            onChange={(e) => setColumnNumber(e.target.value)}
-            placeholder="Enter column number for table"
-            required
-          />
-          <button onClick={handleGraphAndTable}>Submit</button>
-        </div>
-      </div>
       <div>
-        {showChart && (
+        {!showChart ? (
+          <div className="inputNumber">
+            <input
+              type="number"
+              onChange={(e) => setGraphNumber(e.target.value)}
+              placeholder="Enter number of graphs you want to display"
+              required
+            />
+            <input
+              type="number"
+              onChange={(e) => setRowNumber(e.target.value)}
+              placeholder="Enter row number for table"
+              required
+            />
+            <input
+              type="number"
+              onChange={(e) => setColumnNumber(e.target.value)}
+              placeholder="Enter column number for table"
+              required
+            />
+            <button onClick={handleGraphAndTable}>Submit</button>
+          </div>
+        ) : (
           <>
             <Graphs
               graphNumber={graphNumber}
