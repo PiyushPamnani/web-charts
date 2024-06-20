@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
 import "./home.css";
-import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
 import Table from "../Table/Table";
 import Graphs from "../Graphs/Graphs";
 import { header_logo, header, footer } from "../../images";
@@ -96,13 +96,16 @@ const Home = () => {
 
     const addTablePage = async () => {
       const headerElement = document.querySelector(".table_head");
-      const headerCanvas = await html2canvas(headerElement);
-      const headerImgData = headerCanvas.toDataURL("image/png");
-      const headerHeight =
-        (headerCanvas.height * pageWidth) / headerCanvas.width;
-      let currentPageHeight = headerHeight + 50;
+      const headerCanva = await toPng(headerElement, { quality: 4 });
+      const img = new Image();
+      img.src = headerCanva;
+      let headerHeight = 0;
+      img.onload = () => {
+        headerHeight = (img.height * pageWidth) / img.width;
+      };
+      let currentPageHeight = headerHeight + 57;
 
-      pdf.addImage(headerImgData, "PNG", 0, 50, pageWidth, headerHeight);
+      pdf.addImage(headerCanva, "PNG", 0, 50, pageWidth, headerHeight);
 
       while (
         currentPageHeight + 50 < pageHeight - 50 &&

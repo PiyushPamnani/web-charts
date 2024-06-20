@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
 import { generateChart, generateChartData } from "./Graph_Data";
 import "./Graphs.css";
 
@@ -24,8 +24,12 @@ const Graphs = ({ graphNumber, setChartImages, setGraphsReady }) => {
       const imageData = [];
 
       const captureImages = async (chartElement) => {
-        const canvas = await html2canvas(chartElement, { scale: 0.7 });
-        imageData.push(canvas.toDataURL("image/png"));
+        try {
+          const dataUrl = await toPng(chartElement, { quality: 3 });
+          imageData.push(dataUrl);
+        } catch (error) {
+          console.error("Error capturing chart image:", error);
+        }
       };
 
       for (let chartElement of chartElements) {
@@ -37,7 +41,7 @@ const Graphs = ({ graphNumber, setChartImages, setGraphsReady }) => {
     };
 
     if (dataReady) {
-      fetchChartImages();
+      setTimeout(() => fetchChartImages(), 2000);
     }
   }, [dataReady, setChartImages, setGraphsReady]);
 

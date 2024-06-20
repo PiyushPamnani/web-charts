@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, memo } from "react";
-import html2canvas from "html2canvas";
+import { toPng } from "html-to-image";
 import { players, table_headers } from "./Player_Data";
 
 const TableRow = memo(({ row, rowIndex, columnNumber }) => (
@@ -51,20 +51,25 @@ const Table = ({ rowNumber, columnNumber, setBodyImages, setTablesReady }) => {
       const imageData = [];
 
       const captureImages = async (bodyElement) => {
-        const canvas = await html2canvas(bodyElement, { scale: 0.65 });
-        imageData.push(canvas.toDataURL("image/png"));
+        try {
+          const dataUrl = await toPng(bodyElement, { quality: 3 });
+          imageData.push(dataUrl);
+        } catch (error) {
+          console.error("Error capturing table image:", error);
+        }
       };
 
       for (let bodyElement of bodyElements) {
         await captureImages(bodyElement);
       }
 
+      console.log(imageData);
       setBodyImages(imageData);
       setTablesReady(true);
     };
 
     if (tableDataReady) {
-      fetchTableImage();
+      setTimeout(() => fetchTableImage(), 2000);
     }
   }, [tableDataReady, setBodyImages, setTablesReady]);
 

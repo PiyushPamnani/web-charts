@@ -20,7 +20,7 @@ const chartTypes = ["column", "scatter", "line"];
 const generateData = () => {
   return sampleData.map((value, index) => ({
     name: index + 1,
-    y: Math.random() * 10,
+    y: parseFloat((Math.random() * 10).toFixed(2)),
   }));
 };
 
@@ -28,8 +28,8 @@ const generateScatterData = () => {
   const data = [];
   for (let i = 0; i < 50; i++) {
     data.push({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
+      x: parseFloat((Math.random() * 100).toFixed(2)),
+      y: parseFloat((Math.random() * 100).toFixed(2)),
     });
   }
   return data;
